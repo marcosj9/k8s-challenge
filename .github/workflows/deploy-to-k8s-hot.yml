@@ -2,9 +2,6 @@ name: Deploy to Kubernetes (Hot)
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - master
 
 env:
   IMAGE_NAME: my-app

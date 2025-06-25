@@ -38,4 +38,3 @@
           - "To access the Grafana UI, run:"
           - "kubectl port-forward --namespace {{ monitoring_namespace }} svc/prometheus-grafana 8080:80"
           - "Then, open http://localhost:8080 in your browser."
-      tags: [monitoring, instructions]

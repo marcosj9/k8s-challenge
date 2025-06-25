@@ -1,0 +1,10 @@
+# k8s/configmap.yml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-service-config
+  namespace: developer-services
+data:
+  # Example configuration data
+  LOG_LEVEL: "info"
+  FEATURE_FLAG_A: "true"

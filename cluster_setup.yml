@@ -1,0 +1,49 @@
+- name: Configure Base Kubernetes Cluster Setup
+  hosts: k8s_management_node
+  gather_facts: false
+  vars:
+    app_namespace: "developer-services"
+    monitoring_namespace: "monitoring"
+    ingress_namespace: "ingress-nginx"
+
+  tasks:
+    - name: Ensure Application Namespace Exists
+      kubernetes.core.k8s:
+        name: "{{ app_namespace }}"
+        api_version: v1
+        kind: Namespace
+        state: present
+
+    - name: Ensure Monitoring Namespace Exists
+      kubernetes.core.k8s:
+        name: "{{ monitoring_namespace }}"
+        api_version: v1
+        kind: Namespace
+        state: present
+
+    - name: Add NGINX Ingress Controller Helm Repository
+      kubernetes.core.helm_repository:
+        name: ingress-nginx
+        repo_url: "https://kubernetes.github.io/ingress-nginx"
+
+    - name: Install/Upgrade NGINX Ingress Controller via Helm
+      kubernetes.core.helm:
+        name: ingress-nginx
+        chart_ref: ingress-nginx/ingress-nginx
+        release_namespace: "{{ ingress_namespace }}"
+        create_namespace: true
+        state: present
+        values:
+          controller:
+            replicaCount: 2 # HA for the ingress controller
+
+    - name: Label Ingress Namespace for Network Policy
+      kubernetes.core.k8s:
+        api_version: v1
+        kind: Namespace
+        name: "{{ ingress_namespace }}"
+        state: patched
+        definition:
+          metadata:
+            labels:
+              app.kubernetes.io/name: "{{ ingress_namespace }}"

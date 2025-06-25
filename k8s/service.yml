@@ -1,0 +1,30 @@
+# k8s/service.yml
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+  namespace: developer-services
+spec:
+  selector:
+    app: backend-service
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service-nodeport
+  namespace: developer-services
+spec:
+  selector:
+    app: backend-service
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30080
+  type: NodePort

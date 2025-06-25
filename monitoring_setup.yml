@@ -1,0 +1,41 @@
+- name: Deploy Monitoring Stack
+  hosts: k8s_management_node
+  gather_facts: false
+  vars:
+    monitoring_namespace: "monitoring"
+
+  tasks:
+    - name: Add Prometheus Community Helm repository
+      kubernetes.core.helm_repository:
+        name: prometheus-community
+        repo_url: "https://prometheus-community.github.io/helm-charts"
+
+    - name: Add Grafana Helm repository
+      kubernetes.core.helm_repository:
+        name: grafana
+        repo_url: "https://grafana.github.io/helm-charts"
+
+    - name: Install kube-prometheus-stack for metrics
+      kubernetes.core.helm:
+        name: prometheus
+        chart_ref: prometheus-community/kube-prometheus-stack
+        release_namespace: "{{ monitoring_namespace }}"
+        state: present
+
+    - name: Install loki-stack for logging
+      kubernetes.core.helm:
+        name: loki
+        chart_ref: grafana/loki-stack
+        release_namespace: "{{ monitoring_namespace }}"
+        state: present
+
+    - name: Display instructions to get Grafana password
+      ansible.builtin.debug:
+        msg:
+          - "Monitoring stack deployment is complete."
+          - "To get the Grafana admin password, run this command:"
+          - "kubectl get secret --namespace {{ monitoring_namespace }} prometheus-grafana -o jsonpath=\"{.data.admin-password}\" | base64 --decode ; echo"
+          - "To access the Grafana UI, run:"
+          - "kubectl port-forward --namespace {{ monitoring_namespace }} svc/prometheus-grafana 8080:80"
+          - "Then, open http://localhost:8080 in your browser."
+      tags: [monitoring, instructions]

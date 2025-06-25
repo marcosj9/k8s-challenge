@@ -1,0 +1,43 @@
+- name: Apply Security Hardening to Cluster
+  hosts: k8s_management_node
+  gather_facts: false
+  vars:
+    app_namespace: "developer-services"
+    ingress_namespace: "ingress-nginx"
+
+  tasks:
+    - name: Apply Default Deny Network Policy
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: networking.k8s.io/v1
+          kind: NetworkPolicy
+          metadata:
+            name: default-deny-all
+            namespace: "{{ app_namespace }}"
+          spec:
+            podSelector: {} # Apply to all pods in the namespace
+            policyTypes:
+              - Ingress
+              - Egress
+
+    - name: Allow Ingress from NGINX Controller
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: networking.k8s.io/v1
+          kind: NetworkPolicy
+          metadata:
+            name: allow-ingress-from-nginx
+            namespace: "{{ app_namespace }}"
+          spec:
+            podSelector: {} # Apply to all pods
+            policyTypes:
+              - Ingress
+            ingress:
+              - from:
+                  - namespaceSelector:
+                      matchLabels:
+                        app.kubernetes.io/name: "{{ ingress_namespace }}"
+                    podSelector:
+                        app.kubernetes.io/component: controller

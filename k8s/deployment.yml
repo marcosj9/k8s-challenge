@@ -1,0 +1,33 @@
+# k8s/deployment.yml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-service
+  namespace: developer-services
+  labels:
+    app: backend-service
+spec:
+  replicas: 3 # 3 replicas for availability
+  selector:
+    matchLabels:
+      app: backend-service
+  template:
+    metadata:
+      labels:
+        app: backend-service
+    spec:
+      containers:
+        - name: backend-service
+          image: traefik/whoami
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: backend-service-config
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"

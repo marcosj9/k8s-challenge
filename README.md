@@ -14,34 +14,7 @@ Two identical Kubernetes clusters, designated "hot" and "standby". A Load Balanc
 
 ### Architecture Diagram
 
-      +---------------------------+
-      |       End Users           |
-      +-------------+-------------+
-                    |
-                    | (host fqdn)
-                    v
-      +---------------------------+
-      | CloudFlare Load Balancer  |
-      | (with Health Checks)      |
-      +-------------+-------------+
-                    |
-          +-----------------+-----------------+
-          | (Active Traffic)|                 | (Standby)
-          v                 v                 v
-+--------------------------+      +------------------------+
-|      Hot K8s Cluster     |      |   Standby K8s Cluster  |
-| +------------------+     |      | +------------------+   |
-| | NGINX Ingress    |     |      | | NGINX Ingress    |   |
-| +------------------+     |      | +------------------+   |
-|          |               |      |          |             |
-|          v               |      |          v             |
-| +------------------+     |      | +------------------+   |
-| | Backend Service  |     |      | | Backend Service  |   |
-| +------------------+     |      | +------------------+   |
-+--------------------------+      +------------------------+
-          ^                                 ^
-          | (Deployment via CI/CD)          |
-          +---------------------------------+
+https://excalidraw.com/#json=aXAao142_cEl7porgCQSM,X7_LPppz4QNIo1Tq37w4cA
 
 ### Traffic Flow
 
